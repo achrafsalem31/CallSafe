@@ -1,8 +1,8 @@
-# BetrugsSchutz - Anti-Betrugs Web App
+# CallSafe - Anti-Betrugs Web App
 
 Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt für Senioren.
 
-## 🎯 Funktionen
+# Funktionen
 
 ### 1. **Nummernprüfung (Check)**
 - Eingabe verdächtiger Telefonnummern
@@ -49,7 +49,7 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
 - Schnelle Updates
 - Barrierefreie Bedienung
 
-## 🚀 Installation & Nutzung
+## Installation & Nutzung
 
 ### Lokale Entwicklung
 
@@ -63,55 +63,14 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
    └── service-worker.js
    ```
 
-2. **Lokalen Server starten:**
-   
-   **Option A - Python:**
-   ```bash
-   # Python 3
-   python -m http.server 8000
-   
-   # Python 2
-   python -m SimpleHTTPServer 8000
-   ```
-   
-   **Option B - Node.js (http-server):**
-   ```bash
-   npx http-server -p 8000
-   ```
-   
-   **Option C - PHP:**
-   ```bash
-   php -S localhost:8000
-   ```
 
-3. **Browser öffnen:**
-   ```
-   http://localhost:8000
-   ```
 
-### Als PWA installieren
+### PWA installieren
 
 1. App im Browser öffnen
 2. Bei Erscheinen des Install-Prompts auf "Installieren" klicken
 3. Oder manuell über Browser-Menü → "App installieren"
 
-### Deployment
-
-**GitHub Pages:**
-1. Repository erstellen
-2. Dateien hochladen
-3. Settings → Pages → Source: main branch
-4. URL: `https://username.github.io/repo-name`
-
-**Netlify:**
-1. Ordner auf Netlify ziehen
-2. Automatisches Deployment
-
-**Vercel:**
-```bash
-npm i -g vercel
-vercel
-```
 
 ## 🎨 Design-Prinzipien
 
@@ -214,14 +173,14 @@ database.blacklist.push({
 });
 ```
 
-## 📱 Browser-Kompatibilität
+#Browser-Kompatibilität
 
-- ✅ Chrome/Edge 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
+- ✅ Chrome/Edge
+- ✅ Firefox 
+- ✅ Safari 
 - ✅ Chrome Mobile/Safari iOS
 
-## 🔐 Datenschutz
+## Datenschutz
 
 - Alle Daten werden lokal gespeichert (LocalStorage)
 - Keine Server-Kommunikation
@@ -229,7 +188,7 @@ database.blacklist.push({
 - Keine Tracking-Tools
 - Vollständig offline nutzbar
 
-## 🚧 Zukünftige Erweiterungen
+## Zukünftige Erweiterungen
 
 - [ ] Backend-Integration für echte Datenbank
 - [ ] Push-Benachrichtigungen bei neuen Betrugswellen
@@ -239,18 +198,15 @@ database.blacklist.push({
 - [ ] Export von Statistiken
 - [ ] Integration mit Bundesnetzagentur-API
 
-## 📄 Lizenz
-
+## Entwickler
 Diese App wurde als Studienprojekt entwickelt.
-
-## 👥 Entwickler
 
 Master IT-Studienprojekt von:
 - Achraf Salem
 - Saad Ahmito
 - Ilyass Seghir
 
-## 🆘 Support
+## Support
 
 Bei Fragen oder Problemen:
 1. Browserkonsole öffnen (F12)
@@ -258,6 +214,5 @@ Bei Fragen oder Problemen:
 3. LocalStorage prüfen
 4. Cache leeren und neu laden
 
----
 
-**Hinweis:** Diese App ersetzt keine offizielle Beratung. Bei akuten Betrugsfällen kontaktieren Sie die Polizei (110) und die Bundesnetzagentur.
+**Hinweis:** Diese App ersetzt keine offizielle Beratung. Bei Betrugsfällen kontaktieren Sie die Polizei (110) und die Bundesnetzagentur.
