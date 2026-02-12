@@ -94,30 +94,10 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
 
 ## 💾 Datenstruktur
 
-### LocalStorage
-```javascript
-// Statistiken
-betrugsschutz_stats: {
-  totalChecks: number,
-  totalReports: number,
-  totalQuizzes: number,
-  blacklistCount: number
-}
 
-// Kategorien
-betrugsschutz_categories: {
-  enkeltrick: number,
-  polizei: number,
-  schock: number,
-  bank: number,
-  techsupport: number,
-  gewinnspiel: number,
-  sonstiges: number
-}
-```
 
 ### Datenbank (Simulation)
-```javascript
+
 // Whitelist - Sichere Nummern
 whitelist: [{
   number: string,
@@ -139,40 +119,6 @@ reports: [{
   timestamp: ISO string
 }]
 ```
-
-## 🔧 Anpassungen
-
-### Farben ändern
-In `style.css` unter `:root`:
-```css
---color-primary: #2d5a3d;  /* Hauptfarbe */
---color-secondary: #d97706; /* Akzentfarbe */
---color-success: #059669;   /* Erfolg */
---color-warning: #f59e0b;   /* Warnung */
---color-danger: #dc2626;    /* Gefahr */
-```
-
-### Inhalte aktualisieren
-In `app.js` unter `learningContent` und `quizQuestions`:
-```javascript
-const learningContent = {
-  thema: {
-    title: 'Titel',
-    content: 'HTML Inhalt'
-  }
-}
-```
-
-### Datenbank erweitern
-Einfach neue Einträge hinzufügen:
-```javascript
-database.blacklist.push({
-  number: '030 12345678',
-  category: 'enkeltrick',
-  reports: 5
-});
-```
-
 #Browser-Kompatibilität
 
 - ✅ Chrome/Edge
