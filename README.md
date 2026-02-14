@@ -51,19 +51,6 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
 
 ## Installation & Nutzung
 
-### Lokale Entwicklung
-
-1. **Dateien in einem Ordner speichern:**
-   ```
-   betrugsschutz/
-   ├── index.html
-   ├── style.css
-   ├── app.js
-   ├── manifest.json
-   └── service-worker.js
-   ```
-
-
 
 ### PWA installieren
 
@@ -92,33 +79,17 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
   - Keine Panikmache
   - Positive Verstärkung
 
-## 💾 Datenstruktur
-
 
 
 ### Datenbank (Simulation)
 
 // Whitelist - Sichere Nummern
-whitelist: [{
-  number: string,
-  name: string
-}]
 
 // Blacklist - Betrugsnummern
-blacklist: [{
-  number: string,
-  category: string,
-  reports: number
-}]
 
 // Meldungen
-reports: [{
-  phone: string,
-  category: string,
-  details: string,
-  timestamp: ISO string
-}]
-```
+
+
 #Browser-Kompatibilität
 
 - ✅ Chrome/Edge
@@ -152,13 +123,6 @@ Master IT-Studienprojekt von:
 - Saad Ahmito
 - Ilyass Seghir
 
-## Support
-
-Bei Fragen oder Problemen:
-1. Browserkonsole öffnen (F12)
-2. Fehlermeldungen notieren
-3. LocalStorage prüfen
-4. Cache leeren und neu laden
 
 
 **Hinweis:** Diese App ersetzt keine offizielle Beratung. Bei Betrugsfällen kontaktieren Sie die Polizei (110) und die Bundesnetzagentur.
