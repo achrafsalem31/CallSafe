@@ -509,7 +509,7 @@ function initializeCheckPage() {
     });
 }
 
-function checkNumber() {
+async function checkNumber() {
     const input = document.getElementById('phone-input');
     const number = input.value.trim();
     
@@ -521,16 +521,15 @@ function checkNumber() {
     // Show loading
     showLoading();
     
-    // Simulate API call
-    setTimeout(() => {
-        const result = analyzeNumber(number);
-        displayCheckResult(result);
-        hideLoading();
-        
-        // Update stats
-        appState.stats.totalChecks++;
-        saveStats();
-    }, 800);
+    // ✅ SUPABASE: Nummer prüfen
+    const result = await window.DB.checkNumber(number);
+    
+    hideLoading();
+    displayCheckResult(result);
+    
+    // Update stats
+    appState.stats.totalChecks++;
+    saveStats();
 }
 
 function analyzeNumber(number) {
@@ -798,7 +797,7 @@ function initializeReportPage() {
     newReportBtn.addEventListener('click', resetReportForm);
 }
 
-function submitReport() {
+async function submitReport() {
     const phone = document.getElementById('report-phone').value.trim();
     const category = document.getElementById('report-category').value;
     const details = document.getElementById('report-details').value.trim();
@@ -810,17 +809,15 @@ function submitReport() {
     
     showLoading();
     
-    // Simulate API call
-    setTimeout(() => {
-        // Save report
-        const report = {
-            phone: phone,
-            category: category || 'sonstiges',
-            details: details,
-            timestamp: new Date().toISOString()
-        };
-        
-        database.reports.push(report);
+    // ✅ SUPABASE: Nummer melden
+    const success = await window.DB.reportNumber(phone, category, details);
+    
+    hideLoading();
+    
+    if (success) {
+        document.querySelector('.report-form').style.display = 'none';
+        document.querySelector('.report-info').style.display = 'none';
+        document.getElementById('report-success').classList.remove('hidden');
         
         // Update stats
         appState.stats.totalReports++;
@@ -828,28 +825,9 @@ function submitReport() {
             appState.reportsByCategory[category]++;
         }
         saveStats();
-        
-        // Check if number should be added to blacklist
-        const existingReports = database.reports.filter(r => r.phone === phone);
-        if (existingReports.length >= 3) {
-            const existing = database.blacklist.find(item => item.number === phone);
-            if (!existing) {
-                database.blacklist.push({
-                    number: phone,
-                    category: category || 'sonstiges',
-                    reports: existingReports.length
-                });
-                appState.stats.blacklistCount++;
-            }
-        }
-        
-        // Show success
-        document.querySelector('.report-form').style.display = 'none';
-        document.querySelector('.report-info').style.display = 'none';
-        document.getElementById('report-success').classList.remove('hidden');
-        
-        hideLoading();
-    }, 600);
+    } else {
+        alert('Fehler beim Melden der Nummer');
+    }
 }
 
 function resetReportForm() {
@@ -891,53 +869,22 @@ function initializeAdminPage() {
     updateStatsDisplay();
 }
 
-function updateStatsDisplay() {
+async function updateStatsDisplay() {
+    // ✅ SUPABASE: Statistiken laden
+    const stats = await window.DB.getStatistics();
+    const allNumbers = await window.DB.getAllNumbers();
+    
+    // Update Anzeige
     document.getElementById('total-checks').textContent = appState.stats.totalChecks;
-    document.getElementById('total-reports').textContent = appState.stats.totalReports;
+    document.getElementById('total-reports').textContent = stats.totalReports;
     document.getElementById('total-quizzes').textContent = appState.stats.totalQuizzes;
-    document.getElementById('blacklist-count').textContent = database.blacklist.length;
+    document.getElementById('blacklist-count').textContent = stats.totalNumbers;
     
-    // Simple text chart (could be replaced with Chart.js)
-    const canvas = document.getElementById('category-chart');
-    const ctx = canvas.getContext('2d');
+    // Kategorien anzeigen
+    displayCategoryStats(stats.byCategory);
     
-    // Set canvas size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 300;
-    
-    // Draw simple bar chart
-    const categories = Object.keys(appState.reportsByCategory);
-    const values = Object.values(appState.reportsByCategory);
-    const maxValue = Math.max(...values, 1);
-    
-    const barWidth = canvas.width / categories.length - 20;
-    const maxHeight = canvas.height - 60;
-    
-    ctx.fillStyle = '#2d5a3d';
-    ctx.font = '14px sans-serif';
-    
-    categories.forEach((cat, index) => {
-        const value = values[index];
-        const barHeight = (value / maxValue) * maxHeight;
-        const x = index * (barWidth + 20) + 10;
-        const y = canvas.height - barHeight - 40;
-        
-        // Draw bar
-        ctx.fillRect(x, y, barWidth, barHeight);
-        
-        // Draw value
-        ctx.fillStyle = '#1f2937';
-        ctx.fillText(value.toString(), x + barWidth/2 - 10, y - 5);
-        
-        // Draw label
-        ctx.save();
-        ctx.translate(x + barWidth/2, canvas.height - 10);
-        ctx.rotate(-Math.PI / 4);
-        ctx.fillText(cat, 0, 0);
-        ctx.restore();
-        
-        ctx.fillStyle = '#2d5a3d';
-    });
+    // Neueste Nummern anzeigen
+    displayRecentNumbers(allNumbers.slice(0, 5));
 }
 
 function updateNumbersList() {
@@ -1038,3 +985,67 @@ function hideLoading() {
 
 // Make removeFromBlacklist globally available
 window.removeFromBlacklist = removeFromBlacklist;
+
+function displayCategoryStats(byCategory) {
+    const list = document.getElementById('category-list');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    const categories = [
+        { key: 'enkeltrick', name: 'Enkeltrick', icon: '👵' },
+        { key: 'polizei', name: 'Falsche Polizisten', icon: '👮' },
+        { key: 'schock', name: 'Schockanruf', icon: '🚨' },
+        { key: 'bank', name: 'Bank-Betrug', icon: '🏦' },
+        { key: 'techsupport', name: 'Tech-Support', icon: '💻' },
+        { key: 'gewinnspiel', name: 'Gewinnspiel', icon: '🎁' },
+        { key: 'sonstiges', name: 'Sonstiges', icon: '📞' }
+    ];
+    
+    categories.forEach(cat => {
+        const count = byCategory[cat.key] || 0;
+        const item = document.createElement('div');
+        item.className = 'category-item';
+        item.innerHTML = `
+            <span style="font-size: 1.5rem; margin-right: 10px;">${cat.icon}</span>
+            <span style="flex: 1;">${cat.name}</span>
+            <span style="font-weight: bold;">${count}</span>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function displayRecentNumbers(numbers) {
+    const list = document.getElementById('recent-numbers');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    if (numbers.length === 0) {
+        list.innerHTML = '<p>Noch keine Nummern gemeldet</p>';
+        return;
+    }
+    
+    numbers.forEach(num => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 10px; border-bottom: 1px solid #eee;';
+        item.innerHTML = `
+            <strong>${num.phone}</strong><br>
+            <small>${getCategoryName(num.category)} - ${num.reports_count} Meldungen</small>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function getCategoryName(category) {
+    const names = {
+        enkeltrick: 'Enkeltrick',
+        polizei: 'Falsche Polizisten',
+        schock: 'Schockanruf',
+        bank: 'Bank-Betrug',
+        techsupport: 'Tech-Support',
+        gewinnspiel: 'Gewinnspiel',
+        sonstiges: 'Sonstiges'
+    };
+    return names[category] || 'Unbekannt';
+}
