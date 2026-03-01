@@ -887,24 +887,25 @@ async function updateStatsDisplay() {
     displayRecentNumbers(allNumbers.slice(0, 5));
 }
 
-async function updateNumbersList() {
+async function updateNumbersList(searchTerm = '') {
   const listDiv = document.getElementById('numbers-list');
   if (!listDiv) return;
 
-  // 1) UI: message "chargement"
   listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Lade Daten...</p>';
 
   try {
-    // 2) Charger depuis Supabase (vraie DB)
-    const numbers = await window.DB.getAllNumbers();
+    // 1) Charger depuis Supabase
+    const numbers = searchTerm
+      ? await window.DB.searchNumbers(searchTerm)
+      : await window.DB.getAllNumbers();
 
-    // 3) Si vide
+    // 2) Si vide
     if (!numbers || numbers.length === 0) {
-      listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Noch keine gemeldeten Nummern</p>';
+      listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Keine Nummern gefunden</p>';
       return;
     }
 
-    // 4) Construire l’UI
+    // 3) Affichage
     listDiv.innerHTML = '';
 
     numbers.forEach(num => {
@@ -915,14 +916,27 @@ async function updateNumbersList() {
       const count = num.reports_count ?? 1;
       const status = num.status ?? 'unknown';
 
+      // Bouton supprimer: seulement si tu veux l'admin delete
       itemDiv.innerHTML = `
         <div>
           <strong>${num.phone}</strong><br>
           <small>${categoryLabel} | ${count} Meldungen | Status: ${status}</small>
         </div>
+        <button class="btn btn-secondary" data-del="${num.phone}">Entfernen</button>
       `;
 
       listDiv.appendChild(itemDiv);
+    });
+
+    // 4) Brancher les boutons "Entfernen"
+    listDiv.querySelectorAll('button[data-del]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const phone = btn.getAttribute('data-del');
+
+        const ok = await window.DB.deleteNumber(phone);
+        if (ok) updateNumbersList(searchTerm);
+        else alert('Löschen nicht erlaubt (RLS) oder Fehler.');
+      });
     });
 
   } catch (err) {
@@ -930,7 +944,6 @@ async function updateNumbersList() {
     listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Fehler beim Laden (RLS/Netzwerk).</p>';
   }
 }
-
 function removeFromBlacklist(number) {
     const index = database.blacklist.findIndex(item => item.number === number);
     if (index > -1) {
