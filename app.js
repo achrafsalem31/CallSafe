@@ -867,6 +867,18 @@ function initializeAdminPage() {
     });
     
     updateStatsDisplay();
+    // Refresh button
+const refreshBtn = document.getElementById('refresh-numbers');
+if (refreshBtn) refreshBtn.addEventListener('click', () => updateNumbersList());
+
+// Search input
+const searchInput = document.getElementById('number-search');
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    const term = searchInput.value.trim();
+    updateNumbersList(term);
+  });
+}
 }
 
 async function updateStatsDisplay() {
