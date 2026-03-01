@@ -1,10 +1,11 @@
-const CACHE_NAME = 'betrugsschutz-v1';
+const CACHE_NAME = 'betrugsschutz-v2'; 
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './supabase-db.js'
 ];
 
 // Install Service Worker
@@ -49,7 +50,7 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // Return offline page if available
-        return caches.match('/index.html');
+        return caches.match('./index.html');
       })
   );
 });
