@@ -887,27 +887,48 @@ async function updateStatsDisplay() {
     displayRecentNumbers(allNumbers.slice(0, 5));
 }
 
-function updateNumbersList() {
-    const listDiv = document.getElementById('numbers-list');
-    listDiv.innerHTML = '';
-    
-    if (database.blacklist.length === 0) {
-        listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Noch keine gesperrten Nummern</p>';
-        return;
+async function updateNumbersList() {
+  const listDiv = document.getElementById('numbers-list');
+  if (!listDiv) return;
+
+  // 1) UI: message "chargement"
+  listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Lade Daten...</p>';
+
+  try {
+    // 2) Charger depuis Supabase (vraie DB)
+    const numbers = await window.DB.getAllNumbers();
+
+    // 3) Si vide
+    if (!numbers || numbers.length === 0) {
+      listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Noch keine gemeldeten Nummern</p>';
+      return;
     }
-    
-    database.blacklist.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'number-item';
-        itemDiv.innerHTML = `
-            <div>
-                <strong>${item.number}</strong><br>
-                <small>Kategorie: ${item.category} | ${item.reports} Meldungen</small>
-            </div>
-            <button class="btn btn-secondary" onclick="removeFromBlacklist('${item.number}')">Entfernen</button>
-        `;
-        listDiv.appendChild(itemDiv);
+
+    // 4) Construire l’UI
+    listDiv.innerHTML = '';
+
+    numbers.forEach(num => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'number-item';
+
+      const categoryLabel = getCategoryName(num.category);
+      const count = num.reports_count ?? 1;
+      const status = num.status ?? 'unknown';
+
+      itemDiv.innerHTML = `
+        <div>
+          <strong>${num.phone}</strong><br>
+          <small>${categoryLabel} | ${count} Meldungen | Status: ${status}</small>
+        </div>
+      `;
+
+      listDiv.appendChild(itemDiv);
     });
+
+  } catch (err) {
+    console.error('❌ Fehler beim Laden der Nummern:', err);
+    listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Fehler beim Laden (RLS/Netzwerk).</p>';
+  }
 }
 
 function removeFromBlacklist(number) {
