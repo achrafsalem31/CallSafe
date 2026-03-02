@@ -1,4 +1,4 @@
-const CACHE_NAME = 'betrugsschutz-v2'; 
+const CACHE_NAME = 'CallSafe-v3'; 
 const urlsToCache = [
   './',
   './index.html',
