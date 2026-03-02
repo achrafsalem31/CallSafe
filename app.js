@@ -521,7 +521,7 @@ async function checkNumber() {
     // Show loading
     showLoading();
     
-    // ✅ SUPABASE: Nummer prüfen
+    // SUPABASE: Nummer prüfen
     const result = await window.DB.checkNumber(number);
     
     hideLoading();
@@ -809,7 +809,7 @@ async function submitReport() {
     
     showLoading();
     
-    // ✅ SUPABASE: Nummer melden
+    // SUPABASE: Nummer melden
     const success = await window.DB.reportNumber(phone, category, details);
     
     hideLoading();
