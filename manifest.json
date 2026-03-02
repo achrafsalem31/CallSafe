@@ -1,6 +1,6 @@
 {
-  "name": "BetrugsSchutz - Sicher vor Telefonbetrug",
-  "short_name": "BetrugsSchutz",
+  "name": "CallSafe - Sicher vor Telefonbetrug",
+  "short_name": "CallSafe",
   "description": "Schützen Sie sich vor Enkeltrick, falschen Polizisten und anderen Betrugsmaschen am Telefon",
   "start_url": "./index.html",
   "display": "standalone",
