@@ -146,7 +146,63 @@ async function deleteNumberFromDB(phoneNumber) {
         return false;
     }
 }
+async function checkNumberInDB(phoneNumber) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('numbers')
+      .select('phone, category, reports_count, updated_at')
+      .eq('phone', phoneNumber)
+      .maybeSingle();
 
+    if (error) throw error;
+
+    // Pas trouvé
+    if (!data) {
+      return {
+        status: 'warning',
+        title: '⚠️ UNBEKANNT / VORSICHT',
+        reason: 'Diese Nummer ist uns noch nicht bekannt.',
+        category: 'Kategorie: Unbekannt',
+        action: 'Bei Geldforderung oder Druck: sofort auflegen und melden.'
+      };
+    }
+
+    const count = data.reports_count ?? 0;
+    const statusLevel = count >= 5 ? 'danger' : (count >= 3 ? 'warning' : 'safe');
+
+    const categoryNames = {
+      enkeltrick: 'Enkeltrick',
+      polizei: 'Falsche Polizisten',
+      schock: 'Schockanruf',
+      bank: 'Bank-Betrug',
+      techsupport: 'Tech-Support',
+      gewinnspiel: 'Gewinnspiel',
+      sonstiges: 'Sonstiges'
+    };
+
+    return {
+      status: statusLevel,
+      title: statusLevel === 'danger' ? '🚨 BETRUG BESTÄTIGT'
+           : statusLevel === 'warning' ? '⚠️ VORSICHT'
+           : '✅ UNAUFFÄLLIG',
+      reason: `Diese Nummer wurde ${count}x gemeldet.`,
+      category: `Kategorie: ${categoryNames[data.category] || 'Unbekannt'}`,
+      action: statusLevel === 'danger'
+        ? 'Sofort auflegen, nicht zurückrufen, Nummer blockieren.'
+        : 'Vorsichtig sein. Bei Geldforderung sofort auflegen.'
+    };
+
+  } catch (e) {
+    console.error('❌ Fehler beim Prüfen:', e);
+    return {
+      status: 'warning',
+      title: '⚠️ FEHLER',
+      reason: 'Fehler beim Abrufen aus der Datenbank.',
+      category: '',
+      action: 'Bitte später erneut versuchen.'
+    };
+  }
+}
 // Global verfügbar machen
 window.DB = {
     checkNumber: checkNumberInDB,
