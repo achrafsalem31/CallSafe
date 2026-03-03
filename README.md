@@ -7,7 +7,6 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
 ### 1. **Nummernprüfung (Check)**
 - Eingabe verdächtiger Telefonnummern
 - Farbcodierte Risikoeinschätzung:
-  - 🟢 GRÜN: Sicher / Unbekannt
   - 🟡 GELB: Verdächtig gemeldet
   - 🔴 ROT: Bestätigter Betrug
 - Klare Begründung und Kategorisierung
@@ -82,20 +81,13 @@ Eine Progressive Web App (PWA) zum Schutz vor Telefonbetrug, speziell entwickelt
 
 
 ### Datenbank (Simulation)
+-Supabase 
+// reports - Meldungen
 
-// Whitelist - Sichere Nummern
-
-// Blacklist - Betrugsnummern
-
-// Meldungen
+// numbers - Betrugsnummern
 
 
-#Browser-Kompatibilität
 
-- ✅ Chrome/Edge
-- ✅ Firefox 
-- ✅ Safari 
-- ✅ Chrome Mobile/Safari iOS
 
 ## Datenschutz
 
