@@ -6,30 +6,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Supabase Client initialisieren
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/**
- * Nummer in Datenbank prüfen
- */
-async function reportNumberToDB(phoneNumber, category, details = '') {
-  try {
-    // ✅ Insérer uniquement dans reports
-    const { error } = await supabaseClient
-      .from('reports')
-      .insert([{
-        phone: phoneNumber,
-        category: category || 'sonstiges',
-        details: details || ''
-      }]);
 
-    if (error) throw error;
-
-    console.log('✅ Report gespeichert:', phoneNumber);
-    return true;
-
-  } catch (error) {
-    console.error('❌ Fehler beim Melden:', error);
-    return false;
-  }
-}
 /**
  * Nummer in Datenbank melden
  */
