@@ -70,54 +70,66 @@ async function checkNumberInDB(phoneNumber) {
  * Nummer in Datenbank melden
  */
 async function reportNumberToDB(phoneNumber, category, details = '') {
-    try {
-        // Prüfen ob Nummer bereits existiert
-        const { data: existing } = await supabaseClient
-            .from('numbers')
-            .select('*')
-            .eq('phone', phoneNumber)
-            .single();
+  try {
+    // 1) Toujours écrire un "report" (historique)
+    const { error: reportErr } = await supabaseClient
+      .from('reports')
+      .insert([{
+        phone: phoneNumber,
+        category: category || 'sonstiges',
+        details: details || ''
+        // created_at est automatique si ta colonne a default now()
+      }]);
 
-        if (existing) {
-            // UPDATE: Reports erhöhen
-            const newCount = (existing.reports_count || 1) + 1;
-            const newStatus = newCount >= 5 ? 'danger' : 'warning';
+    if (reportErr) throw reportErr;
 
-            const { error } = await supabaseClient
-                .from('numbers')
-                .update({
-                    reports_count: newCount,
-                    status: newStatus,
-                    category: category || existing.category,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('phone', phoneNumber);
+    // 2) Mettre à jour la table numbers (compteur)
+    const { data: existing, error: existingErr } = await supabaseClient
+      .from('numbers')
+      .select('*')
+      .eq('phone', phoneNumber)
+      .maybeSingle(); // mieux que .single() si pas trouvé
 
-            if (error) throw error;
-            console.log('✅ Nummer aktualisiert:', phoneNumber);
+    if (existingErr) throw existingErr;
 
-        } else {
-            // INSERT: Neue Nummer
-            const { error } = await supabaseClient
-                .from('numbers')
-                .insert([{
-                    phone: phoneNumber,
-                    status: 'warning',
-                    category: category,
-                    reports_count: 1,
-                    updated_at: new Date().toISOString()
-                }]);
+    if (existing) {
+      const newCount = (existing.reports_count || 1) + 1;
+      const newStatus = newCount >= 5 ? 'danger' : 'warning';
 
-            if (error) throw error;
-            console.log('✅ Neue Nummer hinzugefügt:', phoneNumber);
-        }
+      const { error: updErr } = await supabaseClient
+        .from('numbers')
+        .update({
+          reports_count: newCount,
+          status: newStatus,
+          category: category || existing.category,
+          updated_at: new Date().toISOString()
+        })
+        .eq('phone', phoneNumber);
 
-        return true;
+      if (updErr) throw updErr;
+      console.log('✅ Nummer aktualisiert + Report gespeichert:', phoneNumber);
 
-    } catch (error) {
-        console.error('❌ Fehler beim Melden:', error);
-        return false;
+    } else {
+      const { error: insErr } = await supabaseClient
+        .from('numbers')
+        .insert([{
+          phone: phoneNumber,
+          status: 'warning',
+          category: category || 'sonstiges',
+          reports_count: 1,
+          updated_at: new Date().toISOString()
+        }]);
+
+      if (insErr) throw insErr;
+      console.log('✅ Neue Nummer + Report gespeichert:', phoneNumber);
     }
+
+    return true;
+
+  } catch (error) {
+    console.error('❌ Fehler beim Melden (reports/numbers):', error);
+    return false;
+  }
 }
 
 /**
