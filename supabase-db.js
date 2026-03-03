@@ -71,63 +71,20 @@ async function checkNumberInDB(phoneNumber) {
  */
 async function reportNumberToDB(phoneNumber, category, details = '') {
   try {
-    // 1) Toujours écrire un "report" (historique)
-    const { error: reportErr } = await supabaseClient
+    const { error } = await supabaseClient
       .from('reports')
       .insert([{
         phone: phoneNumber,
         category: category || 'sonstiges',
         details: details || ''
-        // created_at est automatique si ta colonne a default now()
       }]);
 
-    if (reportErr) throw reportErr;
+    if (error) throw error;
 
-    // 2) Mettre à jour la table numbers (compteur)
-    const { data: existing, error: existingErr } = await supabaseClient
-      .from('numbers')
-      .select('*')
-      .eq('phone', phoneNumber)
-      .maybeSingle(); // mieux que .single() si pas trouvé
-
-    if (existingErr) throw existingErr;
-
-    if (existing) {
-      const newCount = (existing.reports_count || 1) + 1;
-      const newStatus = newCount >= 5 ? 'danger' : 'warning';
-
-      const { error: updErr } = await supabaseClient
-        .from('numbers')
-        .update({
-          reports_count: newCount,
-          status: newStatus,
-          category: category || existing.category,
-          updated_at: new Date().toISOString()
-        })
-        .eq('phone', phoneNumber);
-
-      if (updErr) throw updErr;
-      console.log('✅ Nummer aktualisiert + Report gespeichert:', phoneNumber);
-
-    } else {
-      const { error: insErr } = await supabaseClient
-        .from('numbers')
-        .insert([{
-          phone: phoneNumber,
-          status: 'warning',
-          category: category || 'sonstiges',
-          reports_count: 1,
-          updated_at: new Date().toISOString()
-        }]);
-
-      if (insErr) throw insErr;
-      console.log('✅ Neue Nummer + Report gespeichert:', phoneNumber);
-    }
-
+    console.log('✅ Report gespeichert:', phoneNumber);
     return true;
-
-  } catch (error) {
-    console.error('❌ Fehler beim Melden (reports/numbers):', error);
+  } catch (e) {
+    console.error('❌ Fehler beim Melden:', e);
     return false;
   }
 }
