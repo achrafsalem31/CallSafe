@@ -925,30 +925,27 @@ async function updateNumbersList(searchTerm = '') {
       itemDiv.className = 'number-item';
 
       const categoryLabel = getCategoryName(num.category);
-      const count = num.reports_count ?? 1;
-      const status = num.status ?? 'unknown';
+      const count = num.reports_count ?? 0;
 
-      // Bouton supprimer: seulement si tu veux l'admin delete
+      // Status calculé (puisque la colonne status n'existe plus)
+      const status =
+        count >= 5 ? 'danger' :
+        count >= 3 ? 'warning' :
+        'safe';
+
+      const statusLabel =
+        status === 'danger' ? '🚨 Gefahr' :
+        status === 'warning' ? '⚠️ Verdächtig' :
+        '✅ Unauffällig';
+
       itemDiv.innerHTML = `
         <div>
           <strong>${num.phone}</strong><br>
-          <small>${categoryLabel} | ${count} Meldungen | Status: ${status}</small>
+          <small>${categoryLabel} | ${count} Meldungen | ${statusLabel}</small>
         </div>
-        <button class="btn btn-secondary" data-del="${num.phone}">Entfernen</button>
       `;
 
       listDiv.appendChild(itemDiv);
-    });
-
-    // 4) Brancher les boutons "Entfernen"
-    listDiv.querySelectorAll('button[data-del]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const phone = btn.getAttribute('data-del');
-
-        const ok = await window.DB.deleteNumber(phone);
-        if (ok) updateNumbersList(searchTerm);
-        else alert('Löschen nicht erlaubt (RLS) oder Fehler.');
-      });
     });
 
   } catch (err) {
@@ -956,6 +953,8 @@ async function updateNumbersList(searchTerm = '') {
     listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Fehler beim Laden (RLS/Netzwerk).</p>';
   }
 }
+
+       
 function removeFromBlacklist(number) {
     const index = database.blacklist.findIndex(item => item.number === number);
     if (index > -1) {
