@@ -158,6 +158,6 @@ window.DB = {
     deleteNumber: deleteNumberFromDB
 };
 
-console.log('✅ SECUREME Datenbank verbunden!');
+console.log('✅ CallSafe Datenbank verbunden!');
 console.log('📊 URL:', SUPABASE_URL);
 console.log('📋 Tabelle: numbers');
