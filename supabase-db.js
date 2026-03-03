@@ -9,61 +9,25 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 /**
  * Nummer in Datenbank prüfen
  */
-async function checkNumberInDB(phoneNumber) {
+async function reportNumberToDB(phoneNumber, category, details = '') {
   try {
-    const { data, error } = await supabaseClient
-      .from('numbers')
-      .select('*')
-      .eq('phone', phoneNumber)
-      .single();
+    // ✅ Insérer uniquement dans reports
+    const { error } = await supabaseClient
+      .from('reports')
+      .insert([{
+        phone: phoneNumber,
+        category: category || 'sonstiges',
+        details: details || ''
+      }]);
 
-    // Pas trouvé
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return {
-          status: 'warning',
-          title: '⚠️ UNBEKANNT / VORSICHT',
-          reason: 'Diese Nummer ist uns noch nicht bekannt.',
-          category: 'Verdächtig bei: Geldforderung, Zeitdruck, Geheimniskrämerei',
-          action: '💡 Bei Geldforderung sofort auflegen! Im Zweifel Nummer hier melden.'
-        };
-      }
-      throw error;
-    }
+    if (error) throw error;
 
-    // Trouvé
-    let statusLevel = data.status || 'warning';
-    if ((data.reports_count || 0) >= 5) statusLevel = 'danger';
+    console.log('✅ Report gespeichert:', phoneNumber);
+    return true;
 
-    const categoryNames = {
-      enkeltrick: 'Enkeltrick',
-      polizei: 'Falsche Polizisten',
-      schock: 'Schockanruf',
-      bank: 'Bank-Betrug',
-      techsupport: 'Tech-Support',
-      gewinnspiel: 'Gewinnspiel',
-      sonstiges: 'Sonstiges'
-    };
-
-    return {
-      status: statusLevel,
-      title: statusLevel === 'danger' ? '🚨 BETRUG BESTÄTIGT' : '⚠️ VORSICHT',
-      reason: `Diese Nummer wurde ${data.reports_count || 1}x gemeldet.`,
-      category: `Kategorie: ${categoryNames[data.category] || 'Unbekannt'}`,
-      action: statusLevel === 'danger'
-        ? '⚠️ SOFORT AUFLEGEN! Nicht zurückrufen. Nummer blockieren.'
-        : 'Bei Geldforderung oder Druck: auflegen und melden.'
-    };
-
-  } catch (e) {
-    console.error('❌ Fehler beim Prüfen:', e);
-    return {
-      status: 'warning',
-      title: '⚠️ FEHLER',
-      reason: 'Fehler beim Durchsuchen der Datenbank (RLS/Netzwerk).',
-      category: '',
-      action: 'Bitte später erneut versuchen.'
-    };
+  } catch (error) {
+    console.error('❌ Fehler beim Melden:', error);
+    return false;
   }
 }
 /**
