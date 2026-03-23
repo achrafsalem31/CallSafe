@@ -5,7 +5,7 @@ const urlsToCache = [
   './style.css',
   './app.js',
   './manifest.json',
-  './supabase-db.js'
+  './api-client.js'  // Hier wurde supabase-db.js durch api-client.js ersetzt
 ];
 
 // Install Service Worker
