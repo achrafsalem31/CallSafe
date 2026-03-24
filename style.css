@@ -1,6 +1,5 @@
 /* CSS Variables */
 :root {
-    /* Colors - warm, trustworthy, accessible */
     --color-primary: #2d5a3d;
     --color-primary-dark: #1f4029;
     --color-primary-light: #4a8059;
@@ -15,7 +14,6 @@
     --color-text-light: #6b7280;
     --color-border: #e5e7eb;
     
-    /* Typography - Large, readable fonts */
     --font-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size-xs: 0.875rem;
     --font-size-sm: 1rem;
