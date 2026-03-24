@@ -32,7 +32,24 @@ window.API = {
             console.error('API Error (Report):', e);
             return false;
         }
+    },
+ 
+    async login(username, password) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('admin_users') 
+                .select('password_hash')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (error || !data) return false;
+
+            return data.password_hash === password; 
+        } catch (e) {
+            console.error('Login Error:', e);
+            return false;
+        }
     }
 };
 
-console.log('✅ API-Client ready');
+console.log('✅ API-Client ready with Login support');
