@@ -513,7 +513,7 @@ async function checkNumber() {
     
     showLoading();
     
-    const result = await window.DB.checkNumber(number);
+    const result = await window.API.checkNumber(number);
     
     hideLoading();
     displayCheckResult(result);
@@ -782,7 +782,7 @@ async function submitReport() {
     
     showLoading();
     
-    const success = await window.DB.reportNumber(phone, category, details);
+    const success = await window.API.reportNumber(phone, category, details);
     
     hideLoading();
     
