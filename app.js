@@ -1,4 +1,3 @@
-// App State
 const appState = {
     currentPage: 'check',
     currentQuiz: null,
@@ -38,7 +37,6 @@ const database = {
     reports: []
 };
 
-// Learning Content
 const learningContent = {
     enkeltrick: {
         title: 'Enkeltrick',
@@ -286,7 +284,6 @@ const learningContent = {
     }
 };
 
-// Quiz Questions
 const quizQuestions = {
     enkeltrick: [
         {
@@ -456,7 +453,6 @@ const quizQuestions = {
     ]
 };
 
-// Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeCheckPage();
@@ -468,7 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStats();
 });
 
-// Navigation
 function initializeNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
     
@@ -490,7 +485,6 @@ function switchPage(pageName) {
         page.classList.remove('active');
     });
     
-    // Show selected page
     const selectedPage = document.getElementById(`${pageName}-page`);
     if (selectedPage) {
         selectedPage.classList.add('active');
@@ -498,7 +492,6 @@ function switchPage(pageName) {
     }
 }
 
-// Check Page
 function initializeCheckPage() {
     const checkBtn = document.getElementById('check-btn');
     const phoneInput = document.getElementById('phone-input');
@@ -518,22 +511,18 @@ async function checkNumber() {
         return;
     }
     
-    // Show loading
     showLoading();
     
-    // SUPABASE: Nummer prüfen
     const result = await window.DB.checkNumber(number);
     
     hideLoading();
     displayCheckResult(result);
     
-    // Update stats
     appState.stats.totalChecks++;
     saveStats();
 }
 
 function analyzeNumber(number) {
-    // Check whitelist
     const whitelisted = database.whitelist.find(item => 
         item.number === number
     );
@@ -547,7 +536,6 @@ function analyzeNumber(number) {
         };
     }
     
-    // Check blacklist
     const blacklisted = database.blacklist.find(item => 
         item.number === number
     );
@@ -570,7 +558,6 @@ function analyzeNumber(number) {
         };
     }
     
-    // Unknown number
     return {
         status: 'warning',
         title: '⚠️ UNBEKANNT / VORSICHT',
@@ -595,7 +582,6 @@ function displayCheckResult(result) {
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Learn Page
 function initializeLearnPage() {
     const learnCards = document.querySelectorAll('.learn-card');
     const backBtn = document.querySelector('.back-btn');
@@ -632,7 +618,6 @@ function hideLearnDetail() {
     document.querySelector('.page-header').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Quiz Page
 function initializeQuizPage() {
     const topicBtns = document.querySelectorAll('.quiz-topic-btn');
     const nextBtn = document.getElementById('quiz-next');
@@ -648,7 +633,6 @@ function initializeQuizPage() {
     nextBtn.addEventListener('click', nextQuestion);
     restartBtn.addEventListener('click', resetQuiz);
     reviewBtn.addEventListener('click', () => {
-        // Could implement review functionality
         resetQuiz();
     });
 }
@@ -673,11 +657,9 @@ function loadQuestion() {
     document.getElementById('total-q').textContent = questions.length;
     document.getElementById('question-text').textContent = question.question;
     
-    // Update progress bar
     const progress = ((appState.currentQuestion) / questions.length) * 100;
     document.querySelector('.progress-fill').style.width = `${progress}%`;
     
-    // Show scenario if exists
     const scenarioDiv = document.getElementById('quiz-scenario');
     if (question.scenario) {
         scenarioDiv.textContent = question.scenario;
@@ -686,7 +668,6 @@ function loadQuestion() {
         scenarioDiv.classList.add('hidden');
     }
     
-    // Load options
     const optionsDiv = document.getElementById('quiz-options');
     optionsDiv.innerHTML = '';
     
@@ -707,13 +688,10 @@ function selectAnswer(selectedIndex) {
     const question = questions[appState.currentQuestion];
     const options = document.querySelectorAll('.quiz-option');
     
-    // Disable all options
     options.forEach(opt => opt.classList.add('disabled'));
     
-    // Mark selected
     options[selectedIndex].classList.add('selected');
     
-    // Check if correct
     const isCorrect = selectedIndex === question.correct;
     
     if (isCorrect) {
@@ -724,7 +702,6 @@ function selectAnswer(selectedIndex) {
         options[question.correct].classList.add('correct');
     }
     
-    // Show feedback
     const feedbackDiv = document.getElementById('quiz-feedback');
     feedbackDiv.className = `quiz-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
     feedbackDiv.innerHTML = `
@@ -733,10 +710,8 @@ function selectAnswer(selectedIndex) {
     `;
     feedbackDiv.classList.remove('hidden');
     
-    // Show next button
     document.getElementById('quiz-next').classList.remove('hidden');
     
-    // Save answer
     appState.quizAnswers.push({
         question: question.question,
         selected: selectedIndex,
@@ -777,7 +752,6 @@ function showResults() {
     document.getElementById('total-q').textContent = questions.length;
     document.getElementById('results-message').textContent = message;
     
-    // Update stats
     appState.stats.totalQuizzes++;
     saveStats();
 }
@@ -788,7 +762,6 @@ function resetQuiz() {
     appState.currentQuiz = null;
 }
 
-// Report Page
 function initializeReportPage() {
     const submitBtn = document.getElementById('submit-report');
     const newReportBtn = document.getElementById('new-report');
@@ -809,7 +782,6 @@ async function submitReport() {
     
     showLoading();
     
-    // SUPABASE: Nummer melden
     const success = await window.DB.reportNumber(phone, category, details);
     
     hideLoading();
@@ -819,7 +791,6 @@ async function submitReport() {
         document.querySelector('.report-info').style.display = 'none';
         document.getElementById('report-success').classList.remove('hidden');
         
-        // Update stats
         appState.stats.totalReports++;
         if (category) {
             appState.reportsByCategory[category]++;
@@ -840,7 +811,6 @@ function resetReportForm() {
     document.getElementById('report-success').classList.add('hidden');
 }
 
-// Admin Page
 function initializeAdminPage() {
     const adminTabs = document.querySelectorAll('.admin-tab');
     
@@ -848,11 +818,9 @@ function initializeAdminPage() {
         tab.addEventListener('click', () => {
             const tabName = tab.dataset.tab;
             
-            // Update active tab
             adminTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             
-            // Show content
             document.querySelectorAll('.admin-tab-content').forEach(content => {
                 content.classList.remove('active');
             });
@@ -867,11 +835,9 @@ function initializeAdminPage() {
     });
     
     updateStatsDisplay();
-    // Refresh button
 const refreshBtn = document.getElementById('refresh-numbers');
 if (refreshBtn) refreshBtn.addEventListener('click', () => updateNumbersList());
 
-// Search input
 const searchInput = document.getElementById('number-search');
 if (searchInput) {
   searchInput.addEventListener('input', () => {
@@ -881,21 +847,16 @@ if (searchInput) {
 }
 }
 
-async function updateStatsDisplay() {
-    // ✅ SUPABASE: Statistiken laden
-    const stats = await window.DB.getStatistics();
+async function updateStatsDisplay() {    const stats = await window.DB.getStatistics();
     const allNumbers = await window.DB.getAllNumbers();
     
-    // Update Anzeige
     document.getElementById('total-checks').textContent = appState.stats.totalChecks;
     document.getElementById('total-reports').textContent = stats.totalReports;
     document.getElementById('total-quizzes').textContent = appState.stats.totalQuizzes;
     document.getElementById('blacklist-count').textContent = stats.totalNumbers;
     
-    // Kategorien anzeigen
     displayCategoryStats(stats.byCategory);
     
-    // Neueste Nummern anzeigen
     displayRecentNumbers(allNumbers.slice(0, 5));
 }
 
@@ -906,18 +867,15 @@ async function updateNumbersList(searchTerm = '') {
   listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Lade Daten...</p>';
 
   try {
-    // 1) Charger depuis Supabase
     const numbers = searchTerm
       ? await window.DB.searchNumbers(searchTerm)
       : await window.DB.getAllNumbers();
 
-    // 2) Si vide
     if (!numbers || numbers.length === 0) {
       listDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">Keine Nummern gefunden</p>';
       return;
     }
 
-    // 3) Affichage
     listDiv.innerHTML = '';
 
     numbers.forEach(num => {
@@ -927,7 +885,6 @@ async function updateNumbersList(searchTerm = '') {
       const categoryLabel = getCategoryName(num.category);
       const count = num.reports_count ?? 0;
 
-      // Status calculé (puisque la colonne status n'existe plus)
       const status =
         count >= 5 ? 'danger' :
         count >= 3 ? 'warning' :
@@ -965,7 +922,6 @@ function removeFromBlacklist(number) {
     }
 }
 
-// Stats Management
 function saveStats() {
     localStorage.setItem('betrugsschutz_stats', JSON.stringify(appState.stats));
     localStorage.setItem('betrugsschutz_categories', JSON.stringify(appState.reportsByCategory));
@@ -986,7 +942,6 @@ function loadStats() {
     updateStatsDisplay();
 }
 
-// PWA Functions
 function initializePWA() {
     let deferredPrompt;
     
@@ -994,7 +949,6 @@ function initializePWA() {
         e.preventDefault();
         deferredPrompt = e;
         
-        // Show install prompt
         const installPrompt = document.getElementById('install-prompt');
         installPrompt.classList.remove('hidden');
         
@@ -1012,14 +966,12 @@ function initializePWA() {
         });
     });
     
-    // Register service worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
             .catch(err => console.log('Service Worker registration failed:', err));
     }
 }
 
-// Utility Functions
 function showLoading() {
     document.getElementById('loading').classList.remove('hidden');
 }
@@ -1028,7 +980,6 @@ function hideLoading() {
     document.getElementById('loading').classList.add('hidden');
 }
 
-// Make removeFromBlacklist globally available
 window.removeFromBlacklist = removeFromBlacklist;
 
 function displayCategoryStats(byCategory) {
