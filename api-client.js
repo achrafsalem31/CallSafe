@@ -1,11 +1,10 @@
-// SECUREME - API Client (Backend Connection)
 const SUPABASE_URL = 'https://irfxrvincoaacwpialqp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyZnhydmluY29hYWN3cGlhbHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzIzMTYsImV4cCI6MjA4NjQwODMxNn0.o7GlOpeUoSl5aRmkZSKGhglIsYUMxmTEDtMswCJkQac';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 window.API = {
-    // دالة البحث عن رقم (تأكد أن الجدول سميتو 'numbers')
+ 
     async checkNumber(phoneNumber) {
         try {
             const { data, error } = await supabaseClient
@@ -22,7 +21,6 @@ window.API = {
         }
     },
 
-    // دالة التبليغ عن رقم
     async reportNumber(phone, category, details) {
         try {
             const { error } = await supabaseClient
