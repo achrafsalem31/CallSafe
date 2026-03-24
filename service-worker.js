@@ -5,10 +5,9 @@ const urlsToCache = [
   './style.css',
   './app.js',
   './manifest.json',
-  './api-client.js'  // Hier wurde supabase-db.js durch api-client.js ersetzt
+  './api-client.js'  
 ];
 
-// Install Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,24 +18,20 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch from cache
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
 
         return fetch(event.request).then(
           response => {
-            // Check if valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
-            // Clone the response
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
@@ -49,13 +44,11 @@ self.addEventListener('fetch', event => {
         );
       })
       .catch(() => {
-        // Return offline page if available
         return caches.match('./index.html');
       })
   );
 });
 
-// Update Service Worker
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   
