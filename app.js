@@ -847,7 +847,7 @@ if (searchInput) {
 }
 }
 
-async function updateStatsDisplay() {    const stats = await window.DB.getStatistics();
+async function updateStatsDisplay() {    const stats = await window.API.getStatistics();
     const allNumbers = await window.DB.getAllNumbers();
     
     document.getElementById('total-checks').textContent = appState.stats.totalChecks;
