@@ -4,6 +4,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 window.API = {
+    // دالة البحث عن رقم
     async checkNumber(phoneNumber) {
         try {
             const { data, error } = await supabaseClient
@@ -19,8 +20,7 @@ window.API = {
         }
     },
 
-   // ... الكود الفوقاني كيبقا كيمها هو ...
-
+    // دالة التبليغ
     async reportNumber(phone, category, details) {
         try {
             const { error } = await supabaseClient
@@ -33,11 +33,12 @@ window.API = {
         }
     },
  
-    async login(email, password) { // تأكد من وجود { هنا
+    // دالة تسجيل الدخول (مصلحة لتناسب جدول Supabase الخاص بك)
+    async login(email, password) { // زدنا { اللي كانت ناقصة
         try {
             const { data, error } = await supabaseClient
                 .from('admin_users') 
-                .select('password') 
+                .select('password') // استعملنا اسم العمود password كما في الصورة
                 .eq('email', email) 
                 .maybeSingle();
 
@@ -46,18 +47,20 @@ window.API = {
                 return false;
             }
 
+            // التأكد من وجود مكتبة التشفير
             const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
             if (!bcrypt) {
-                console.error('Bcrypt library not found!');
+                console.error('Bcrypt Library missing!');
                 return false;
             }
-            
+
+            // مقارنة الباسورد العادي مع الهاش المشفر من الداتابيز
             return bcrypt.compareSync(password, data.password);
         } catch (e) {
             console.error('Login Error:', e);
             return false;
         }
-    } // سدّة الدالة
-}; // سدّة window.API
+    }
+};
 
-console.log('✅ API-Client ready with Login support');
+console.log('✅ API-Client ready with corrected Login function');
