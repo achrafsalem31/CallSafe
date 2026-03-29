@@ -25,7 +25,7 @@ function isAdmin() {
     const user = JSON.parse(localStorage.getItem('user'));
     // كتحقق واش كاين مستخدم وفيه الصلاحية ديال admin
     return user && user.role === 'admin';
-    }
+}
 
 // Database Simulation
 const database = {
