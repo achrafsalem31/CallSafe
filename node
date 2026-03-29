@@ -1,0 +1,4 @@
+const bcrypt = require('bcryptjs');
+const password = 'Admin123!Sicher';
+const hash = bcrypt.hashSync(password, 10);
+console.log("HAD HOWA L'HASH DIALK:", hash);
