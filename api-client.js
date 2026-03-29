@@ -19,6 +19,8 @@ window.API = {
         }
     },
 
+   // ... الكود الفوقاني كيبقا كيمها هو ...
+
     async reportNumber(phone, category, details) {
         try {
             const { error } = await supabaseClient
@@ -31,25 +33,31 @@ window.API = {
         }
     },
  
-  async login(email, password)   
-    try {
-        const { data, error } = await supabaseClient
-            .from('admin_users') 
-            .select('password') 
-            .eq('email', email) 
-            .maybeSingle();
+    async login(email, password) { // تأكد من وجود { هنا
+        try {
+            const { data, error } = await supabaseClient
+                .from('admin_users') 
+                .select('password') 
+                .eq('email', email) 
+                .maybeSingle();
 
-        if (error || !data) {
-            console.error('Admin nicht gefunden');
+            if (error || !data) {
+                console.error('Admin nicht gefunden');
+                return false;
+            }
+
+            const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
+            if (!bcrypt) {
+                console.error('Bcrypt library not found!');
+                return false;
+            }
+            
+            return bcrypt.compareSync(password, data.password);
+        } catch (e) {
+            console.error('Login Error:', e);
             return false;
         }
-
-        const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
-        return bcrypt.compareSync(password, data.password);
-    } catch (e) {
-        console.error('Login Error:', e);
-        return false;
-    }
-}
+    } // سدّة الدالة
+}; // سدّة window.API
 
 console.log('✅ API-Client ready with Login support');
