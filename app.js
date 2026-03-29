@@ -20,6 +20,11 @@ const appState = {
         sonstiges: 0
     }
 };
+// زيدها هنا (مثلاً السطر 25)
+function isAdmin() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    // كتحقق واش كاين مستخدم وفيه الصلاحية ديال admin
+    return user && user.role === 'admin';
 
 // Database Simulation
 const database = {
@@ -471,19 +476,16 @@ function initializeNavigation() {
         btn.addEventListener('click', async () => {
             const page = btn.dataset.page;
 
-            if (page === 'admin') {
-                const password = prompt("Bitte Admin-Passwort eingeben:");
-                
-const isAuthorized = await window.API.login('admin@secureme.de', password);
-                
-                if (!isAuthorized) {
-                    alert("Zugriff verweigert: Falsches Passwort!");
-                    return; 
-                }
+            // 🛡️ هادا هو القفل الجديد
+            if (page === 'admin' && !isAdmin()) {
+                alert("Zugriff verweigert: Bitte loggen Sie sich als Admin ein.");
+                // هنا مستقبلاً نقدروا نفتحوا نافذة Login (Modal)
+                return; // كيوقف ومكايدوزش للصفحة
             }
 
             switchPage(page);
             
+            // تحديث الألوان ديال الأزرار
             navBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
