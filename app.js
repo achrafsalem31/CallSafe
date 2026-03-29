@@ -468,11 +468,22 @@ function initializeNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
     
     navBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const page = btn.dataset.page;
+
+            if (page === 'admin') {
+                const password = prompt("Bitte Admin-Passwort eingeben:");
+                
+                const isAuthorized = await window.API.login('admin', password);
+
+                if (!isAuthorized) {
+                    alert("Zugriff verweigert: Falsches Passwort!");
+                    return; 
+                }
+            }
+
             switchPage(page);
             
-            // Update active state
             navBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
@@ -480,7 +491,6 @@ function initializeNavigation() {
 }
 
 function switchPage(pageName) {
-    // Hide all pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
