@@ -31,23 +31,25 @@ window.API = {
         }
     },
  
-    async login(username, password) {
-        try {
-            const { data, error } = await supabaseClient
-                .from('admin_users')
-                .select('password_hash')
-                .eq('username', username)
-                .maybeSingle();
+  async login(email, password)   
+    try {
+        const { data, error } = await supabaseClient
+            .from('admin_users') 
+            .select('password') 
+            .eq('email', email) 
+            .maybeSingle();
 
-            if (error || !data) return false;
-
-            const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
-            return bcrypt.compareSync(password, data.password_hash);
-        } catch (e) {
-            console.error('Login Error:', e);
+        if (error || !data) {
+            console.error('Admin nicht gefunden');
             return false;
         }
-    } 
-}; 
+
+        const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
+        return bcrypt.compareSync(password, data.password);
+    } catch (e) {
+        console.error('Login Error:', e);
+        return false;
+    }
+}
 
 console.log('✅ API-Client ready with Login support');
