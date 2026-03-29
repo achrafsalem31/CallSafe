@@ -474,8 +474,8 @@ function initializeNavigation() {
             if (page === 'admin') {
                 const password = prompt("Bitte Admin-Passwort eingeben:");
                 
-                const isAuthorized = await window.API.login('admin', password);
-
+const isAuthorized = await window.API.login('admin@secureme.de', password);
+                
                 if (!isAuthorized) {
                     alert("Zugriff verweigert: Falsches Passwort!");
                     return; 
