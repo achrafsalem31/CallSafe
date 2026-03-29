@@ -15,7 +15,7 @@ window.API = {
         const data = await response.json();
         
         if (response.ok) {
-            // حفظ التوكن والمعلومات في localStorage (مهم بزاف للـ Admin Check)
+            // حفظ التوكن والمعلومات في localStorage
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             return data;
@@ -27,7 +27,6 @@ window.API = {
     // 3. فحص الأرقام (Check Number)
     async checkNumber(phoneNumber) {
         try {
-            // تحويل الرقم لشكل مناسب للرابط (URL Encode)
             const encodedPhone = encodeURIComponent(phoneNumber);
             const response = await fetch(`${API_URL}/numbers/check/${encodedPhone}`);
             return await response.json();
@@ -52,7 +51,31 @@ window.API = {
             console.error('Error reporting number:', e);
             return false;
         }
+    },
+
+    // 5. جلب الإحصائيات (هادي اللي كانت ناقصاك)
+    async getStatistics() {
+        try {
+            const response = await fetch(`${API_URL}/numbers/stats`);
+            if (!response.ok) throw new Error('Fehler beim Laden der Stats');
+            return await response.json();
+        } catch (e) {
+            console.error('Stats Error:', e);
+            return { totalReports: 0, totalNumbers: 0, byCategory: {} };
+        }
+    },
+
+    // 6. جلب جميع الأرقام للقائمة (ضرورية لصفحة الإدارة)
+    async getAllNumbers() {
+        try {
+            const response = await fetch(`${API_URL}/numbers`);
+            if (!response.ok) throw new Error('Fehler beim Laden der Nummern');
+            return await response.json();
+        } catch (e) {
+            console.error('Numbers List Error:', e);
+            return [];
+        }
     }
 };
 
-console.log('✅ Frontend API-Client switched to Node.js Backend');
+console.log('✅ API-Client updated with Statistics and Numbers support');
