@@ -4,7 +4,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 window.API = {
- 
     async checkNumber(phoneNumber) {
         try {
             const { data, error } = await supabaseClient
@@ -12,7 +11,6 @@ window.API = {
                 .select('*')
                 .eq('phone', phoneNumber)
                 .maybeSingle();
-
             if (error) throw error;
             return data;
         } catch (e) {
@@ -26,7 +24,6 @@ window.API = {
             const { error } = await supabaseClient
                 .from('reports')
                 .insert([{ phone, category, details }]);
-            
             return !error;
         } catch (e) {
             console.error('API Error (Report):', e);
@@ -35,19 +32,22 @@ window.API = {
     },
  
     async login(username, password) {
-    try {
-        const { data, error } = await supabaseClient
-            .from('admin_users')
-            .select('password_hash')
-            .eq('username', username)
-            .maybeSingle();
+        try {
+            const { data, error } = await supabaseClient
+                .from('admin_users')
+                .select('password_hash')
+                .eq('username', username)
+                .maybeSingle();
 
-        if (error || !data) return false;
+            if (error || !data) return false;
 
-        return dcodeIO.bcrypt.compareSync(password, data.password_hash);
-    } catch (e) {
-        console.error('Login Error:', e);
-        return false;
-    }
-}
+            const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
+            return bcrypt.compareSync(password, data.password_hash);
+        } catch (e) {
+            console.error('Login Error:', e);
+            return false;
+        }
+    } 
+}; 
+
 console.log('✅ API-Client ready with Login support');
