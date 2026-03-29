@@ -1,66 +1,58 @@
-const SUPABASE_URL = 'https://irfxrvincoaacwpialqp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyZnhydmluY29hYWN3cGlhbHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MzIzMTYsImV4cCI6MjA4NjQwODMxNn0.o7GlOpeUoSl5aRmkZSKGhglIsYUMxmTEDtMswCJkQac';
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 1. إعداد رابط السيرفر المحلي (Node.js)
+const API_URL = 'http://localhost:3000/api';
 
 window.API = {
-    // دالة البحث عن رقم
+    // 2. تسجيل الدخول (Login)
+    async login(email, password) {
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // حفظ التوكن والمعلومات في localStorage (مهم بزاف للـ Admin Check)
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            return data;
+        } else {
+            throw new Error(data.error || 'Login fehlgeschlagen');
+        }
+    },
+
+    // 3. فحص الأرقام (Check Number)
     async checkNumber(phoneNumber) {
         try {
-            const { data, error } = await supabaseClient
-                .from('numbers')
-                .select('*')
-                .eq('phone', phoneNumber)
-                .maybeSingle();
-            if (error) throw error;
-            return data;
+            // تحويل الرقم لشكل مناسب للرابط (URL Encode)
+            const encodedPhone = encodeURIComponent(phoneNumber);
+            const response = await fetch(`${API_URL}/numbers/check/${encodedPhone}`);
+            return await response.json();
         } catch (e) {
-            console.error('API Error (Check):', e);
+            console.error('Error checking number:', e);
             return null;
         }
     },
 
-    // دالة التبليغ
+    // 4. التبليغ عن رقم (Submit Report)
     async reportNumber(phone, category, details) {
         try {
-            const { error } = await supabaseClient
-                .from('reports')
-                .insert([{ phone, category, details }]);
-            return !error;
+            const response = await fetch(`${API_URL}/reports`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phone, category, details })
+            });
+            return response.ok;
         } catch (e) {
-            console.error('API Error (Report):', e);
-            return false;
-        }
-    },
- 
-    // دالة تسجيل الدخول (مصلحة لتناسب جدول Supabase الخاص بك)
-    async login(email, password) { // زدنا { اللي كانت ناقصة
-        try {
-            const { data, error } = await supabaseClient
-                .from('admin_users') 
-                .select('password') // استعملنا اسم العمود password كما في الصورة
-                .eq('email', email) 
-                .maybeSingle();
-
-            if (error || !data) {
-                console.error('Admin nicht gefunden');
-                return false;
-            }
-
-            // التأكد من وجود مكتبة التشفير
-            const bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
-            if (!bcrypt) {
-                console.error('Bcrypt Library missing!');
-                return false;
-            }
-
-            // مقارنة الباسورد العادي مع الهاش المشفر من الداتابيز
-            return bcrypt.compareSync(password, data.password);
-        } catch (e) {
-            console.error('Login Error:', e);
+            console.error('Error reporting number:', e);
             return false;
         }
     }
 };
 
-console.log('✅ API-Client ready with corrected Login function');
+console.log('✅ Frontend API-Client switched to Node.js Backend');
