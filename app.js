@@ -860,7 +860,9 @@ if (searchInput) {
 }
 }
 
-async function updateStatsDisplay() {    const stats = await window.API.getStatistics();
+async function updateStatsDisplay() {
+    const statsResponse = await window.API.getStatistics();
+    const stats = statsResponse.stats || statsResponse; // Kompatibilität
     const allNumbers = await window.API.getAllNumbers();
     
     document.getElementById('total-checks').textContent = appState.stats.totalChecks;
