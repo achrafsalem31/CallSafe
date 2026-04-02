@@ -1,18 +1,11 @@
-// ===================================
-// SECUREME API Client - KORRIGIERT ✅
-// Unterstützt BEIDE: window.API & window.DB
-// ===================================
+
 
 const API_URL = 'http://localhost:3000/api';
 
-// Token Helper
 function getToken() {
     return localStorage.getItem('token');
 }
 
-// ===================================
-// AUTH FUNKTIONEN
-// ===================================
 
 async function login(email, password) {
     try {
@@ -58,9 +51,7 @@ function getCurrentUser() {
     return JSON.parse(localStorage.getItem('user') || '{}');
 }
 
-// ===================================
-// NUMBERS FUNKTIONEN
-// ===================================
+
 
 async function checkNumberInDB(phoneNumber) {
     try {
@@ -70,7 +61,6 @@ async function checkNumberInDB(phoneNumber) {
         
         if (!response.ok) throw new Error(data.error);
         
-        // Format für app.js
         if (!data.found) {
             return {
                 status: 'warning',
@@ -194,11 +184,7 @@ async function searchNumbersInDB(searchTerm) {
     }
 }
 
-// ===================================
-// EXPORT - BEIDE NAMESPACES!
-// ===================================
 
-// Für neuen Code (window.API)
 window.API = {
     login,
     logout,
@@ -212,7 +198,6 @@ window.API = {
     searchNumbers: searchNumbersInDB
 };
 
-// Für alten Code (window.DB) - BACKWARD COMPATIBILITY!
 window.DB = {
     checkNumber: checkNumberInDB,
     reportNumber: reportNumberToDB,
