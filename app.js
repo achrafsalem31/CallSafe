@@ -477,16 +477,13 @@ function initializeNavigation() {
         btn.addEventListener('click', async () => {
             const page = btn.dataset.page;
 
-            // 🛡️ هادا هو القفل الجديد
             if (page === 'admin' && !isAdmin()) {
                 alert("Zugriff verweigert: Bitte loggen Sie sich als Admin ein.");
-                // هنا مستقبلاً نقدروا نفتحوا نافذة Login (Modal)
-                return; // كيوقف ومكايدوزش للصفحة
+                return; 
             }
 
             switchPage(page);
             
-            // تحديث الألوان ديال الأزرار
             navBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
