@@ -20,14 +20,11 @@ const appState = {
         sonstiges: 0
     }
 };
-// زيدها هنا (مثلاً السطر 25)
 function isAdmin() {
     const user = JSON.parse(localStorage.getItem('user'));
-    // كتحقق واش كاين مستخدم وفيه الصلاحية ديال admin
     return user && user.role === 'admin';
 }
 
-// Database Simulation
 const database = {
     blacklist: [
         { number: '030 98765432', category: 'enkeltrick', reports: 12 },
