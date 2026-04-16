@@ -1,11 +1,22 @@
-
-
 const API_URL = 'http://localhost:3000/api';
+window.API_URL = API_URL;
 
+function getAuthHeaders() {
+    const token = getToken();
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+}
 function getToken() {
     return localStorage.getItem('token');
 }
-
+window.getToken = getToken;
 
 async function login(email, password) {
     try {
@@ -128,42 +139,57 @@ async function reportNumberToDB(phoneNumber, category, details = '') {
 
 async function getStatisticsFromDB() {
     try {
-        const response = await fetch(`${API_URL}/numbers/stats`);
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Backend gibt { stats: {...} } zurück
-            return data.stats || data;
-        } else {
-            throw new Error(data.error);
+        const response = await fetch(`${API_URL}/numbers/stats`, {
+            headers: getAuthHeaders()
+        });
+
+        const text = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('Stats response is not JSON:', text);
+            throw new Error('Stats response is not valid JSON');
         }
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Fehler beim Laden der Statistiken');
+        }
+
+        return data.stats || data;
     } catch (error) {
         console.error('Stats error:', error);
         return {
             totalNumbers: 0,
             totalReports: 0,
-            byCategory: {}
+            byCategory: {},
+            byStatus: {}
         };
     }
 }
 
 async function getAllNumbersFromDB() {
     try {
-        const token = getToken();
-        
-        const headers = {};
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        const response = await fetch(`${API_URL}/numbers`, {
+            headers: getAuthHeaders()
+        });
+
+        const text = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('Numbers response is not JSON:', text);
+            throw new Error('Numbers response is not valid JSON');
         }
-        
-        const response = await fetch(`${API_URL}/numbers`, { headers });
-        const data = await response.json();
-        
-        if (response.ok) {
-            return data.numbers || [];
-        } else {
-            throw new Error(data.error);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Fehler beim Laden der Nummern');
         }
+
+        return data.numbers || data || [];
     } catch (error) {
         console.error('Get numbers error:', error);
         return [];
@@ -209,3 +235,4 @@ window.DB = {
 console.log('✅ API Client geladen');
 console.log('📊 Backend:', API_URL);
 console.log('🔌 window.API & window.DB bereit!');
+

@@ -151,23 +151,184 @@
         </section>
 
         <section id="admin-page" class="page">
-            <div class="page-header"><h1>Verwaltung</h1><p class="subtitle">Datenbank und Statistiken</p></div>
-            <div class="admin-container">
-                <div class="admin-tabs"><button class="admin-tab active" data-tab="stats">Statistiken</button><button class="admin-tab" data-tab="numbers">Nummern</button><button class="admin-tab" data-tab="content">Inhalte</button></div>
-                <div id="stats-tab" class="admin-tab-content active">
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="total-checks">-</div><div class="stat-label">Nummern geprüft</div></div>
-                        <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value" id="total-reports">-</div><div class="stat-label">Meldungen</div></div>
-                        <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-value" id="total-quizzes">-</div><div class="stat-label">Quiz absolviert</div></div>
-                        <div class="stat-card"><div class="stat-icon">🛡️</div><div class="stat-value" id="blacklist-count">-</div><div class="stat-label">Gemeldete Nummern</div></div>
-                    </div>
-                    <div class="chart-container"><h3>Meldungen nach Kategorie</h3><div id="category-list" class="category-list"></div></div>
-                    <div class="numbers-preview"><h3>Zuletzt gemeldete Nummern</h3><div id="recent-numbers" class="recent-numbers-list"></div></div>
+    <div class="page-header">
+        <h1>Admin-Verwaltung</h1>
+        <p class="subtitle">Vollständige Kontrolle über alle Inhalte</p>
+    </div>
+
+    <div class="admin-container">
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="stats">📊 Dashboard</button>
+            <button class="admin-tab" data-tab="numbers">📱 Nummern</button>
+            <button class="admin-tab" data-tab="quiz">🎯 Quiz</button>
+            <button class="admin-tab" data-tab="training">📚 Trainings</button>
+            <button class="admin-tab" data-tab="users">👥 Benutzer</button>
+        </div>
+
+        <!-- 1. Dashboard Tab -->
+        <div id="stats-tab" class="admin-tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="total-checks">-</div>
+                    <div class="stat-label">Nummern geprüft</div>
                 </div>
-                <div id="numbers-tab" class="admin-tab-content"><div class="numbers-controls"><input type="text" id="number-search" placeholder="Nummer suchen..." class="search-input"><button id="refresh-numbers" class="btn btn-primary">Aktualisieren</button></div><div id="numbers-list" class="numbers-list"></div></div>
-                <div id="content-tab" class="admin-tab-content"><div class="content-editor"><h3>Lernmodule verwalten</h3><p>Hier können Sie die Inhalte der Lernmodule bearbeiten und aktualisieren.</p><button class="btn btn-secondary">Inhalte bearbeiten</button></div></div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value" id="total-reports">-</div>
+                    <div class="stat-label">Meldungen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="total-quizzes">-</div>
+                    <div class="stat-label">Quiz absolviert</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🛡️</div>
+                    <div class="stat-value" id="blacklist-count">-</div>
+                    <div class="stat-label">Gemeldete Nummern</div>
+                </div>
             </div>
-        </section>
+
+            <div class="chart-container">
+                <h3>Meldungen nach Kategorie</h3>
+                <div id="category-list" class="category-list"></div>
+            </div>
+
+            <div class="numbers-preview">
+                <h3>Zuletzt gemeldete Nummern</h3>
+                <div id="recent-numbers" class="recent-numbers-list"></div>
+            </div>
+        </div>
+
+        <!-- 2. Numbers Tab -->
+        <div id="numbers-tab" class="admin-tab-content">
+            <div class="numbers-controls" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="number-search" placeholder="Nummer suchen..." class="search-input" style="flex: 1;">
+                <button id="add-number-btn" class="btn btn-primary">+ Nummer hinzufügen</button>
+                <button id="refresh-numbers" class="btn btn-secondary">🔄 Aktualisieren</button>
+            </div>
+            <div id="numbers-list" class="numbers-list"></div>
+        </div>
+
+        <!-- 3. Quiz Tab -->
+        <div id="quiz-tab" class="admin-tab-content">
+            <div style="margin-bottom: 20px;">
+                <button onclick="showAddQuizModal()" class="btn btn-primary">+ Quiz erstellen</button>
+                <button onclick="loadAdminQuizzes()" class="btn btn-secondary">🔄 Aktualisieren</button>
+            </div>
+            <div id="quizzes-list"></div>
+        </div>
+
+        <!-- 4. Training Tab -->
+        <div id="training-tab" class="admin-tab-content">
+            <div style="margin-bottom: 20px;">
+                <button onclick="alert('Training erstellen kommt bald!')" class="btn btn-primary">+ Training erstellen</button>
+                <button onclick="loadAdminTrainings()" class="btn btn-secondary">🔄 Aktualisieren</button>
+            </div>
+            <div id="trainings-list"></div>
+        </div>
+
+        <!-- 5. Users Tab -->
+        <div id="users-tab" class="admin-tab-content">
+            <div style="margin-bottom: 20px;">
+                <button onclick="alert('User-Verwaltung kommt bald!')" class="btn btn-secondary">🔄 Aktualisieren</button>
+            </div>
+            <div id="users-list">
+                <p style="padding: 20px; text-align: center; color: #666;">User-Verwaltung wird bald implementiert</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- Admin Tab Styles -->
+<style>
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.admin-tab {
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.admin-tab:hover {
+    background: #f5f5f5;
+    border-color: #2d5a3d;
+}
+
+.admin-tab.active {
+    background: #2d5a3d;
+    color: white;
+    border-color: #2d5a3d;
+}
+
+.admin-tab-content {
+    display: none;
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+.search-input {
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #2d5a3d;
+}
+
+.btn-danger {
+    background: #d32f2f !important;
+    color: white !important;
+}
+
+.btn-danger:hover {
+    background: #b71c1c !important;
+}
+</style>
+
+<!-- Tab Switching Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Tab Switching
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked tab
+            tab.classList.add('active');
+            document.getElementById(`${targetTab}-tab`).classList.add('active');
+            
+            // Load content based on tab
+            if (targetTab === 'quiz' && typeof loadAdminQuizzes === 'function') {
+                loadAdminQuizzes();
+            } else if (targetTab === 'training' && typeof loadAdminTrainings === 'function') {
+                loadAdminTrainings();
+            }
+        });
+    });
+});
+</script>
+
     </main>
 
     <div id="install-prompt" class="install-prompt hidden">
@@ -186,7 +347,8 @@
 
     
     <script src="api-client.js"></script> 
-    
+    <script src="admin-system.js"></script>
+    <script src="admin-management-complete.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

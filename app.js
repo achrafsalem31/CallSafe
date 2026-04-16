@@ -462,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeLearnPage();
     initializeQuizPage();
     initializeReportPage();
-    initializeAdminPage();
     initializePWA();
     loadStats();
 });
@@ -474,9 +473,9 @@ function initializeNavigation() {
         btn.addEventListener('click', async () => {
             const page = btn.dataset.page;
 
-            if (page === 'admin' && !isAdmin()) {
-                alert("Zugriff verweigert: Bitte loggen Sie sich als Admin ein.");
-                return; 
+            // Laisse admin-system.js gérer entièrement la navigation admin
+            if (page === 'admin') {
+                return;
             }
 
             switchPage(page);
@@ -855,6 +854,12 @@ if (searchInput) {
 }
 
 async function updateStatsDisplay() {
+
+    if (!isAdmin()) {
+        console.log("⛔ Not admin → skip stats");
+        return;
+    }
+
     const statsResponse = await window.API.getStatistics();
     const stats = statsResponse.stats || statsResponse; // Kompatibilität
     const allNumbers = await window.API.getAllNumbers();
@@ -870,6 +875,12 @@ async function updateStatsDisplay() {
 }
 
 async function updateNumbersList(searchTerm = '') {
+
+  if (!isAdmin()) {
+    console.log("⛔ Not admin → skip numbers");
+    return;
+  }
+
   const listDiv = document.getElementById('numbers-list');
   if (!listDiv) return;
 
@@ -947,8 +958,7 @@ function loadStats() {
     if (savedCategories) {
         appState.reportsByCategory = JSON.parse(savedCategories);
     }
-    
-    updateStatsDisplay();
+
 }
 
 function initializePWA() {
