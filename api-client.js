@@ -66,12 +66,27 @@ function getCurrentUser() {
 
 async function checkNumberInDB(phoneNumber) {
     try {
+        console.log('API.checkNumber reçu:', phoneNumber);
+
         const encodedPhone = encodeURIComponent(phoneNumber);
-        const response = await fetch(`${API_URL}/numbers/check/${encodedPhone}`);
-        const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.error);
-        
+        const url = `${API_URL}/numbers/check/${encodedPhone}`;
+        console.log('URL appelée:', url);
+
+        const response = await fetch(url);
+        console.log('Status réponse:', response.status);
+
+        const rawText = await response.text();
+        console.log('Réponse brute:', rawText);
+
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch (e) {
+            throw new Error(`Réponse non JSON: ${rawText}`);
+        }
+
+        if (!response.ok) throw new Error(data.error || 'Erreur backend');
+
         if (!data.found) {
             return {
                 status: 'warning',
@@ -81,29 +96,29 @@ async function checkNumberInDB(phoneNumber) {
                 action: 'Vorsichtig sein!'
             };
         }
-        
+
         const titles = {
             safe: '✅ UNAUFFÄLLIG',
             warning: '⚠️ VORSICHT',
             danger: '🚨 BETRUG BESTÄTIGT'
         };
-        
+
         return {
             status: data.status,
             title: titles[data.status] || '⚠️ UNBEKANNT',
             reason: data.message,
             category: data.data?.category || 'Unbekannt',
-            action: data.status === 'danger' 
-                ? 'Sofort auflegen!' 
+            action: data.status === 'danger'
+                ? 'Sofort auflegen!'
                 : 'Vorsichtig sein!'
         };
-        
     } catch (error) {
-        console.error('Check error:', error);
+        console.error('Check error complet:', error);
+
         return {
             status: 'warning',
             title: '⚠️ FEHLER',
-            reason: 'Fehler beim Abrufen',
+            reason: `Fehler beim Abrufen: ${error.message || error}`,
             category: '',
             action: 'Später erneut versuchen'
         };
